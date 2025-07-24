@@ -38,7 +38,8 @@ This will cause `z` to be the result of `Evaluate()`, otherwise the result would
 ```
 if (condition expression, true expression, false expression);
 ```
-Internally, the `if` block treats `0d` as false and anything else as true.
+Internally, the `if` block treats `0d` as false and anything else as true.  
+Keep in mind that as of right now, both true and false expressions are evaluated regardles, but their results are returned by the `if` function (yes, it's technically just a function) based on the condition.  
 
 ---
 
