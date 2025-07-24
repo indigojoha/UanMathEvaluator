@@ -40,3 +40,4 @@ This will cause `z` to be the result of `Evaluate()`, otherwise the result would
 ```
 if (condition expression, true expression, false expression);
 ```
+Internally, the `if` block treats `0d` as false and anything else as true.
