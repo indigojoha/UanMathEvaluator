@@ -1,7 +1,5 @@
 ﻿using UanMathEvaluator.inner;
-using System;
 using System.Collections.Generic;
-using UanMathEvaluator.inner.nodes;
 
 namespace UanMathEvaluator
 {
@@ -18,12 +16,22 @@ namespace UanMathEvaluator
             statements = parser.ParseStatements();
         }
 
-        public double Evaluate()
+        public MathVar Evaluate()
         {
-            double result = 0;
+            return Evaluate(Variables, Functions);
+        }
+
+        public MathVar Evaluate(Dictionary<string, double> vars, Dictionary<string, MathMethod> functions)
+        {
+            MathVar result = new MathVar();
             foreach (var statement in statements)
-                result = statement.Evaluate(Variables, Functions);
+                result = statement.Evaluate(vars, functions);
             return result;
+        }
+
+        public override string ToString()
+        {
+            return string.Join("; ", statements);
         }
     }
 }

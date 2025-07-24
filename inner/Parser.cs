@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using UanMathEvaluator.inner.nodes;
 
 namespace UanMathEvaluator.inner
 {
@@ -119,6 +118,8 @@ namespace UanMathEvaluator.inner
                 _pos++;
                 return node;
             }
+            else if (Current == '{')
+                return ParseParsableNode();
 
             throw new Exception($"Unexpected character: {Current}");
         }
@@ -129,6 +130,31 @@ namespace UanMathEvaluator.inner
             while (char.IsDigit(Current) || Current == '.') _pos++;
             var numStr = _text.Substring(start, _pos - start);
             return new NumberNode(double.Parse(numStr));
+        }
+
+        private ExprNode ParseParsableNode()
+        {
+            _pos++; // skip '{'
+            int depth = 1;
+            int start = _pos;
+
+            while (_pos < _text.Length)
+            {
+                if (_text[_pos] == '{') depth++;
+                else if (_text[_pos] == '}')
+                {
+                    depth--;
+                    if (depth == 0) break;
+                }
+                _pos++;
+            }
+
+            if (depth != 0)
+                throw new Exception("Unmatched '{' in input");
+
+            string innerCode = _text.Substring(start, _pos - start);
+            _pos++; // skip '}'
+            return new ExpressionNode(innerCode);
         }
 
         private ExprNode ParseIdentifierOrFunction()
