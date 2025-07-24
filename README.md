@@ -30,18 +30,34 @@ However, it also supports multiple expressions with variable assignment and if b
 ```
 x = 1;
 y = 2;
-z = if (x == 1, 32, 128);
+if (x == 1,
+  {
+    z = 32
+  },
+  {
+    z = 128
+  });
 z;
 ```
-This will cause `z` to be the result of `Evaluate()`, otherwise the result would be the result of the `if` block, which is still `z` in this example, but it's good practice to make the returned variable explicit.  
-`if` blocks are structured like so:
+This will cause `z` to be the result of `Evaluate()`, otherwise the result would be the result of the `if` block, as it's good practice to make the returned variable explicit.  
+## if function
+`if` blocks (`if` functions) are structured like so:  
 ```
-if (condition expression, true expression, false expression);
+if (condition expression, {true expression}, {false expression});
 ```
 Internally, the `if` block treats `0d` as false and anything else as true.  
-Keep in mind that as of right now, both true and false expressions are evaluated regardles, but their results are returned by the `if` function (yes, it's technically just a function) based on the condition.  
 
----
+## for function
+`for` blocks are structured like so:  
+```
+for (iterations, {expression})
+```
+You can access the current iteration number as `iter`.  
+Nested loops are allowed, but from the first nested loop onwards you access each iteration number as `iter1`, `iter2`, `iter3`, etc...  
 
-# Todo list
-- Allow unevaluated expressions as function arguments other than double 
+## while function
+`while` blocks are structured like so:  
+```
+while ({condition expression}, {expression})
+```
+This will repeat `{expression}` until `{condition expression}` returns 0.
