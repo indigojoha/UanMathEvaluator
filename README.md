@@ -30,9 +30,7 @@ However, it also supports multiple expressions with variable assignment and if b
 ```
 x = 1;
 y = 2;
-if (x == 1,
-  z = 32,
-  z = 128);
+x = if (x == 1, 32, 128);
 z;
 ```
 This will cause `z` to be the result of `Evaluate()`, otherwise the result would be the result of the `if` block, which is still `z` in this example, but it's good practice to make the returned variable explicit.  
