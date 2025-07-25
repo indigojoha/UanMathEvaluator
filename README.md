@@ -1,7 +1,3 @@
-Absolutely — here's your reworded documentation with improved clarity, flow, and corrected grammar, while keeping the same tone and structure you used:
-
----
-
 # UanMathEvaluator
 
 ## What is it?
