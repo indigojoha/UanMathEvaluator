@@ -1,32 +1,83 @@
+Absolutely — here's your reworded documentation with improved clarity, flow, and corrected grammar, while keeping the same tone and structure you used:
+
+---
+
 # UanMathEvaluator
+
 ## What is it?
-**UanMathEvaluator** is a simple netstandard2.0 library written in C# that adds the ability to evaluate multi-line mathematical expressions with function calls, variable assignments, and conditionals.  
+
+**UanMathEvaluator** is a simple (not necessarily lightweight) C# library targeting **.NET Standard 2.0** that enables evaluation of multi-line mathematical expressions with support for function calls, variable assignments, and control flow like `if`, `for`, and `while`.
+
+---
+
 ## How do I use it?
-Once you're referincing the DLL in your project, simply create an expression object:
-```C#
+
+After referencing the DLL in your project, you can create and evaluate expressions like so:
+
+```csharp
 UanMathEvaluator.Expression expr = new UanMathEvaluator.Expression("x + y");
 ```
-Then you can set variables of type `double`:
-```C#
+
+Assign values to variables (type `double`):
+
+```csharp
 expr.Variables["x"] = 1;
 expr.Variables["y"] = 2;
 ```
-or functions that return `double`:
-```C#
-expr.Functions["halve"] = new UanMathEvaluator.inner.MathMethod()
+
+Define custom functions that return a `double`:
+
+```csharp
+expr.Functions["halve"] = new UanMathEvaluator.MathMethod()
 {
-  ArgumentCount = 1,
-  Method = args => args[0] * 0.5d
+    ArgumentCount = 1,
+    Method = args => args[0].Value * 0.5d
+};
+
+expr.Functions["while"] = new UanMathEvaluator.MathMethod()
+{
+    ArgumentCount = 2,
+    Method = args =>
+    {
+        // evaluates the first argument as a body type 
+        while (args[0].Expression.Evaluate(vars, functions).Value != 0)
+        {
+            evalArgs[1].Expression.Evaluate(vars, functions);
+        }
+        return 1;
+    }
 };
 ```
-Finally, you can evaluate it with:
-```C#
-double result = expr.Evaluate(); // this returns 3 
+
+Then evaluate the expression:
+
+```csharp
+double result = expr.Evaluate(); // Returns 3
 ```
-Please note that variables and functions will not work as the parser completely removes all whitespaces.  
-## What do the expressions look like?
-It supports normal linear math expressions like `x + y * sin(z)`.
-However, it also supports multiple expressions with variable assignment and if blocks:
+
+> ⚠️ **Note:** The parser strips all whitespace from expressions, which may affect variable or function names if spacing is relied on.
+
+---
+
+## What does the syntax look like?
+
+### Argument Types
+
+Functions take one of two argument types:
+
+* **`value`** — an expression that's immediately evaluated during parsing
+* **`body`** — a block of code inside `{}` that’s only evaluated when called
+
+### General Syntax
+
+You can use standard math expressions like:
+
+```
+x + y * sin(z)
+```
+
+You can also define variables, execute conditional logic, and write multi-line code:
+
 ```
 x = 1;
 y = 2;
@@ -39,25 +90,85 @@ if (x == 1,
   });
 z;
 ```
-This will cause `z` to be the result of `Evaluate()`, otherwise the result would be the result of the `if` block, as it's good practice to make the returned variable explicit.  
-## if function
-`if` blocks (`if` functions) are structured like so:  
-```
-if (condition expression, {true expression}, {false expression});
-```
-Internally, the `if` block treats `0d` as false and anything else as true.  
 
-## for function
-`for` blocks are structured like so:  
-```
-for (iterations, {expression})
-```
-You can access the current iteration number as `iter`.  
-Nested loops are allowed, but from the first nested loop onwards you access each iteration number as `iter1`, `iter2`, `iter3`, etc...  
+In this case, `Evaluate()` returns the value of `z`, as the final line determines the return value of the entire expression. It's good practice to explicitly return a final variable or result.
 
-## while function
-`while` blocks are structured like so:  
+---
+
+## Operators
+
+The evaluator supports the following:
+
+* **Arithmetic operators**: `+`, `-`, `*`, `/`, `^`, `%`
+* **Logical operators**: `&&`, `||`
+* **Comparison operators**: `==`, `!=`, `<`, `<=`, `>`, `>=`
+
+---
+
+## `if` Function
+
+Conditional blocks are written as:
+
 ```
-while ({condition expression}, {expression})
+if (condition : value, trueBlock : body, falseBlock : body);
 ```
-This will repeat `{expression}` until `{condition expression}` returns 0.
+
+Internally, any non-zero value is considered **true**; `0` is **false**.
+
+Example:
+
+```
+if (x > 0,
+  { y = 1 },
+  { y = -1 });
+```
+
+---
+
+## `for` Function
+
+Loop blocks look like this:
+
+```
+for (iterations : value, block : body)
+```
+
+You can access the current iteration index using the variable `iter`.
+
+Nested loops are supported. Each nested level uses `iter1`, `iter2`, `iter3`, and so on:
+
+```
+for (3, {
+  for (2, {
+    total = total + iter * iter1;
+  });
+});
+```
+
+---
+
+## `while` Function
+
+While loops are defined like this:
+
+```
+while (condition : body, block : body)
+```
+
+The `block` runs repeatedly until `condition` evaluates to `0`. As with `if`, any non-zero value means true.
+
+Example:
+
+```
+x = 5;
+while ({ x > 0 }, {
+  x = x - 1;
+});
+x;
+```
+
+This returns `0`.
+
+---
+
+Let me know if you want this formatted as markdown for a GitHub README or extended with advanced examples or internal implementation notes.
